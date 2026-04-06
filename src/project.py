@@ -101,7 +101,7 @@ def run_demo(path: str, n: int = 10) -> dict[str, object]:
 
 
 if __name__ == "__main__":
-    file_path = Path("data/wagner.txt")  # ← your book file
+    file_path = Path("data/sample.txt")  # ← your book file
 
     if file_path.exists():
         results = run_demo(str(file_path), 10)
@@ -111,3 +111,4 @@ if __name__ == "__main__":
             print(f"{key}: {value}")
     else:
         print("❌ File not found. Put 'wagner.txt' inside data folder.")
+        
