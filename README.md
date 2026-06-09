@@ -1,79 +1,58 @@
 # P1: Data Detective
 
-## Summary
-This project loads a text file, normalizes and tokenizes the text, counts word
-frequencies, reports the top N most common words, and identifies the longest word
-that appears only once in the text.
+Summary
+This project analyzes a text file, counts word frequencies, shows the top N words, and reports one extra insight. In this version, the extra insight is lexical diversity — the ratio of unique words to total words.
 
-## Dataset
-- *File:* data/wagner.txt  
-- *Source:* Project Gutenberg — https://www.gutenberg.org/ebooks/52091  
-- *Why I chose it:*  
-*My Life — Volume 1* by Richard Wagner is a public-domain autobiography written by
-the famous German composer. Unlike fictional novels, this text provides a personal
-narrative of Wagner’s early life, experiences, and artistic development. The writing
-style is more formal and reflective, containing long sentences and descriptive
-language. This makes it interesting for analysis because the vocabulary includes both
-common words and rare, expressive terms. The dataset allows meaningful insights into
-how autobiographical texts differ from fictional works in terms of word usage and
-frequency patterns.
+Dataset
+File: data/sample.txt
+Why I chose it: I used a short sports-themed text because it is easy to verify by hand and includes repeated words, punctuation, and mixed sentence structure. That makes it a good small dataset for testing frequency analysis.
+How to run
+pytest -q
+python -m src.project
+Usage examples
 
-## How to run
-python -m pytest -q  
+# Run the unit tests
+pytest -q
+
+# Run the report using the bundled sample dataset (top 5 words)
 python -m src.project
 
-## Approach
-- Load the raw text from a UTF-8 file using `Path.read_text()`
-- Normalize: convert all text to lowercase, remove punctuation, and collapse extra whitespace
-- Tokenize: split the cleaned text into a list of individual words
-- Count frequencies: use a dictionary to count occurrences of each word
-- Find top N: sort by frequency (descending) and alphabetically for ties, then return top N
-- Extra insight: identify all words that appear once and return the longest among them
+# Run the report showing the top 3 words for a specific file
+python -m src.project --file data/sample.txt --top 3
+CLI flags
 
-## Complexity
+--file / -f: path to a text file to analyze (default: data/sample.txt)
+--top / -n: number of top words to display (default: 5)
+Approach
+Load text from a file.
+Normalize the text by converting it to lowercase.
+Tokenize the text into words using regular expressions.
+Count word frequencies with a dictionary.
+Sort and display the top N words.
+Report an extra insight: most frequent word, total words, unique words, and lexical diversity.
+Complexity
+count_words
+Time: O(w)
+Space: O(u)
+Why: The function visits each word once and stores one count per unique word.
+top_n_words
+Time: O(u log u)
+Space: O(u)
+Why: The unique-word dictionary is sorted by frequency, so the sort dominates the running time.
+Edge-case checklist
+ empty file
+ punctuation-heavy input
+ repeated words
+ uppercase/lowercase differences
+ n <= 0
+Assistance & sources
+AI used? Y
+What it helped with: polishing the README, improving edge-case handling, and checking test coverage.
+Other sources: Python documentation for re and pathlib.
+Design note (150–250 words)
+For this project, I selected a short football-themed text file as the dataset. I chose it because it is small enough to check manually, but still includes repeated vocabulary, punctuation, and natural sentence patterns that make frequency analysis meaningful. My main design decision was to keep the program simple and readable: one function loads the file, one tokenizes the text, one counts frequencies, and one returns the top N results. This makes the code easy to test and easy to improve later.
 
-### count_words
-- *Time:* O(n) — one pass through the list of words  
-- *Space:* O(u) — storing counts for each unique word  
-- *Why:* Each word is processed once and dictionary operations (lookup and update)
-are O(1) on average, resulting in linear time complexity.
+The easiest part of the project was using a dictionary to store word counts, because that matches the problem directly and runs efficiently. The harder part was making the behavior reliable for edge cases such as empty files, capitalization differences, punctuation-heavy input, and invalid values like n <= 0. I also wanted the output to look clear when the program is run from the command line.
 
-### top_n_words
-- *Time:* O(u log u) — sorting unique words dominates  
-- *Space:* O(u) — storing all word-count pairs before slicing  
-- *Why:* The sorting step uses Python’s Timsort algorithm, which runs in
-O(u log u), and this dominates the total cost compared to slicing.
+If I were improving the project next, I would let the user choose any text file from the command line and add a simple bar chart of the most frequent words for a more visual presentation.
 
-## Edge-case checklist
-- [x] *Empty file* — returns empty results without crashing; extra_insight returns ""  
-- [x] *Punctuation-heavy input* — punctuation removed during normalization  
-- [x] *Repeated words* — correctly counted using dictionary accumulation  
-- [x] *Uppercase/lowercase differences* — normalized to lowercase before counting  
-- [x] **n <= 0** — returns an empty list safely  
-
-## Assistance & sources
-- *AI used?* Yes  
-- *What it helped with:* Understanding code structure, fixing syntax errors,
-and improving explanations for complexity and design  
-- *Other sources:* Project Gutenberg (https://www.gutenberg.org) for dataset  
-
-## Design note (150–250 words)
-I chose *My Life — Volume 1* by Richard Wagner because it provides a different type
-of dataset compared to fictional novels. As an autobiography, the text reflects
-personal experiences, thoughts, and historical context, which results in a more
-formal and descriptive writing style. This makes the analysis interesting because
-the most frequent words reveal patterns of narration rather than dialogue or action.
-
-The design of the program follows a modular approach, where each function is
-responsible for a single task. For example, normalization handles text cleaning,
-tokenization splits the text, and counting tracks word frequency. This separation
-makes the code easier to test and debug. One challenge I encountered was ensuring
-that punctuation removal did not affect readability while still producing accurate
-results. For example, removing hyphens can combine words, but this was acceptable
-for the purpose of analysis.
-
-The extra insight I implemented is finding the longest word that appears only once
-in the text. This helps highlight rare and complex vocabulary used by Wagner,
-providing deeper understanding of his writing style. As a future improvement, I
-would add stop-word filtering to remove very common words like “the” and “and” so
-that the results focus more on meaningful and unique terms.
